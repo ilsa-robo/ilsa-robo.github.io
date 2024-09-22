@@ -39,7 +39,7 @@
 
 
                         <h1 class="title is-1 publication-title">
-                          <img src="assets/images/logo.png" class="small-image"><span style="color: rgb(24, 209, 207);">I</span><span style="color: rgb(18, 156, 189);">L</span><span style="color: rgb(13, 104, 171);">S</span><span style="color: rgb(8, 52, 154);">A</span>: Incremental Learning for Robot Shared Autonomy
+                          <img src="assets/images/logo.png" class="small-image"><span style="color: rgb(24, 209, 207);">I</span><span style="color: rgb(18, 156, 189);">L</span><span style="color: rgb(13, 104, 171);">S</span><span style="color: rgb(8, 52, 154);">A</span>: Incremental Learning for <br> Robot Shared Autonomy
                         </h1>
                         <h3 class="title is-4 conference-authors"><a target="_blank" href="">In submission</a>
                     </h3>
@@ -49,7 +49,7 @@
                                     Yiran Tao</a><sup>1</sup>,
                                 <a target="_blank" href="https://ilsa-robo.github.io/">
                                       Helen Qiao</a><sup>2</sup>,
-                                <a target="_blank" href="https://ilsa-robo.github.io/">
+                                <a target="_blank" href="https://www.shrs.pitt.edu/people/dan-ding">
                                         Dan Ding</a><sup>3</sup>,
                                 <a target="_blank"
                                     href="https://zackory.com/">Zackory Erickson</a><sup>1</sup>,
@@ -59,8 +59,8 @@
 
                         <div class="is-size-5 publication-authors">
                             <span class="author-block"><sup>1</sup>CMU, </span>
-                            <span class="author-block"><sup>2</sup>, </span>
-                            <span class="author-block"><sup>3</sup>, </span>
+                            <span class="author-block"><sup>2</sup>NIST, </span>
+                            <span class="author-block"><sup>3</sup>Pitt </span>
               
                         </div>
                         
@@ -101,7 +101,7 @@
             <!-- Abstract. -->
             <div class="columns is-centered has-text-centered">
                 <video poster="" id="" autoplay controls loop width="100%" playbackRate=2.0 style="border-radius: 5px;">
-                    <source src="videos/trailer.mp4" type="video/mp4">
+                    <source src="videos/ilsa.mp4" type="video/mp4">
                 </video>
             </div>
         </div>
@@ -115,8 +115,7 @@
                     <h2 class="title is-3">Abstract</h2>
                     <div class="content has-text-justified">
                         <p style="font-size: 125%">
-                          Recent learning-based shared autonomy methods often require extensive expert demonstrations for training, which can be resource-intensive and difficult to scale. Moreover, these systems typically remain static after deployment, lacking mechanisms for continuous improvement. To address these limitations, we propose an  Incrementally Learned Shared Autonomy (ILSA) framework. ILSA begins with pretraining on synthetic demonstrations generated from intuitive rules and continuously refines its performance through repeated user interactions. With a carefully designed training paradigm, ILSA balances learning from new data with retaining existing knowledge, enabling robust improvement after every user interaction, even in the face of limited data generalizability. We validate ILSA through a comprehensive ablation study and a user study with 20 participants, demonstrating its effectiveness and robustness in both quantitative performance and user-reported qualitative metrics.
-                            
+                            Shared autonomy holds promise for improving the usability and accessibility of assistive robotic arms, but current methods often rely on costly expert demonstrations and lack the ability to adapt post-deployment. This paper introduces ILSA, an Incrementally Learned Shared Autonomy framework that continually improves its assistive control policy through repeated user interactions. ILSA leverages synthetic kinematic trajectories for initial pretraining, reducing the need for expert demonstrations, and then incrementally finetunes its policy after each manipulation interaction, with mechanisms to balance new knowledge acquisition with existing knowledge retention during incremental learning. We validate ILSA for complex long-horizon tasks through a comprehensive ablation study and a user study with 20 participants, demonstrating its effectiveness and robustness in both quantitative performance and user-reported qualitative metrics.                          
 
 <br>
 <br>
@@ -133,99 +132,101 @@
             <div class="rows">
                 <div class="rows is-centered ">
                     <div class="row is-full-width">
-                        <h2 class="title is-3"><span class="dvima">RoboGen Pipeline</span></h2>
-                        <!-- <img src="videos/pipeline.m4v" class="interpolation-image" alt=""
-                            style="display: block; margin-left: auto; margin-right: auto; max-width: 80%;" /> -->
-                            <video autoplay controls muted loop playsinline height="100%">
-                              <source src="videos/pipeline_cropped.mp4"
-                                      type="video/mp4">
-                            </video>
-                        <br>
+                        <h2 class="title is-3"><span class="dvima">Methodology</span></h2>                        
                         <span style="font-size: 125%">
-                            <span style="font-weight: bold">RoboGen is a fully automated pipeline for endless and diverse skill acquisition.</span> RoboGen pipeline consists of 4 stages: A) task proposal, B) scene generation, C) training supervision generation, and D) skill learning with generated information.
+                            <span>Our goal is to develop a function that maps the task state and user action to a robot action that is both task-optimal and aligned with the user's intent. While the function may be imperfect initially, it is designed to <strong>improve over times</strong> through continuous user interaction with the shared autonomy system. 
                         </span>
+                        <br>
+                        <br>
+                        <h3 style="font-weight: bold;">Action Generation Model</h3> 
+                        <!-- We use a transformer-based robot action generation model to represent this function. The model generates two types of output actions: an intermediate action without user guidance and a final action with user guidance.  These actions are supervised by different loss functions, ensuring task completion and aligning the final output with the user’s intent, maintaining the user’s sense of control.  -->
+                        <img src="images/model.png" class="interpolation-image" alt=""
+                        style="display: block; margin-left: auto; margin-right: auto; max-width: 80%;" />
+                        <br>
+                        <h3 style="font-weight: bold;">Synthetic Kinematic Trajectory Generation</h3> 
+                        <img src="images/kinematics.png" class="interpolation-image" alt=""
+                        style="display: block; margin-left: auto; margin-right: auto; max-width: 80%;" />
+                        <br>
+                        <h3 style="font-weight: bold;">Finetuning Designs in the Incremental Learning Phase</h3> 
+
+                    <!-- 新增三张并排的图片及注释 -->
+                    <div class="columns" style="display: flex; align-items: flex-end; justify-content: space-between; margin-top: 20px;">
+                        <div class="column">
+                            <img src="images/correction.png" alt="Finetuning 1" style="width: 100%; display: block; margin-left: auto; margin-right: auto;">
+                            <p style="text-align: center;">Corrected Trajectory Generation</p>
+                        </div>
+                        <div class="column">
+                            <img src="images/supervision.png" alt="Finetuning 2" style="width: 100%; display: block; margin-left: auto; margin-right: auto;">
+                            <p style="text-align: center;">Layered Supervision</p>
+                        </div>
+                        <div class="column">
+                            <img src="images/freeze.png" alt="Finetuning 3" style="width: 100%; display: block; margin-left: auto; margin-right: auto;">
+                            <p style="text-align: center;">Partial Model Update</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+
+    
+
 
     <section class="section">
         <div class="container is-max-widescreen">
             <div class="rows">
                 <div class="rows is-centered ">
                     <div class="row is-full-width">
-                        <h2 class="title is-3"><span class="dvima">Long-horizon task generation and learning</span></h2>
-                        <img src="assets/images/long-horizon.png" class="interpolation-image" alt=""
-                            style="display: block; margin-left: auto; margin-right: auto; max-width: 80%;" />
+                        <h2 class="title is-3"><span class="dvima">Human Study</span></h2>
+                        <span style="font-size: 125%">We conducted a user study subject to a university-approved IRB protocol with 20 participants, none of whom reported having prior experience teleoperating robots. </span>                      
                         <br>
-                        <span style="font-size: 125%">RoboGen is able to propose high-level tasks, generate corresponding environments, decompose the high-level goal into low-level subtasks, and then learn the sub-skills sequentially.
-                        </span>
+                    </div>
+                </div>
+                
+                <div class="columns">
+                    <div class="column">
+                        <video width="100%" controls>
+                            <source src="videos/first.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <p  style="font-size: 125%">In the first interactions, ILSA lacks the knowledge to avoid collisions, leading to objects hitting obstacles.</p>
+                    </div>
+                    <div class="column">
+                        <video width="100%" controls>
+                            <source src="videos/fourth.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <p  style="font-size: 125%">After just a few interactions, ILSA has learned effective collision avoidance, helping users complete tasks more smoothly. </p>
+                    </div>
+                </div>
+
+                <br>
+                <div class="rows is-centered ">
+                    <div class="row is-full-width">
+                        <span style="font-size: 125%">Statistical Analysis of both task completion times and user-reported metrics supports the following two hypotheses:</span>
+                        <ul style="font-size: 125%; margin-top: 15px; list-style-type: disc; padding-left: 20px;">
+                            <li><strong>H1:</strong> ILSA supports faster robot manipulation task completion times and easier manipulator control as compared to pure teleoperation.</li>
+                            <li><strong>H2:</strong> ILSA improves task performance over time as a user repeatedly performs a task, in contrast to a static shared autonomy method.</li>
+                        </ul>
+                        <br>
+                        <div class="columns" style="display: flex; align-items: flex-end; justify-content: space-between; margin-top: 20px;">
+                            <div class="column">
+                                <img src="images/time.png" alt="Mean Task Completion Times" style="width: 100%; display: block; margin-left: auto; margin-right: auto;">
+                                <!-- <p style="text-align: center;">Task Completion Times</p> -->
+                            </div>
+                            <div class="column">
+                                <img src="images/likert.png" alt="Median Likert Item Responses" style="width: 100%; display: block; margin-left: auto; margin-right: auto;">
+                                <!-- <p style="text-align: center;">Median Likert Item Responses</p> -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    
-    <!-- interactive examples of long horizon tasks -->
-    <section class="section">
-      <div class="container is-max-widescreen">
-          <div class="rows">
-              <div class="rows is-centered ">
-                  <div class="row is-full-width">
-                      <h2 class="title is-3"><span class="dvima">RoboGen generated tasks, scenes, training supervisions, and learned skills</span></h2>
-                      <p style="font-size: 125%">
-                          Please select an image below to view the results.
-                      </p>
-                  </div>
-              </div>
-          </div>
-          <br>
-          <div class="columns" style="align-items: end;">
-              <div class="column is-half">
-                  <!-- <p style="font-size: 1.5em"><b>Isaac</b></p> -->
-                  
-                  <div class="col-md-4 col-sm-4 col-xs-4">
 
-                    <img src="videos/task_store_an_item_into_the_storagefurniture_2023-10-05-00-26-46.png" width="24.5%" style="border-radius: 10px;" alt='<b>store an item into the storagefurniture</b>, RoboGen Results (scene configuration, task decomposition and supervisions):
-                    [sep]
-                    assets/robogen_results/store_an_item_into_the_storagefurniture.txt' onclick="populateDemo(this, 1);">
-            
-        
-                    
-                    <!-- <img src="videos/task_Throw_Trash_Away_2023-10-09-01-01-03.png" width="24.5%" style="border-radius: 10px;" alt='<b>Throw Trash Away</b>, RoboGen Results (scene configuration, task decomposition and supervisions):
-                    [sep]
-                    assets/robogen_results/Throw_Trash_Away.txt' onclick="populateDemo(this, 1);"> -->
-            
-                    <img src="videos/task_Heat_up_a_bowl_of_soup_in_microwave_2023-10-05-02-51-38.png" width="24.5%" style="border-radius: 10px;" alt='<b>Heat up a bowl of soup in microwave</b>, RoboGen Results (scene configuration, task decomposition and supervisions):
-                    [sep]
-                    assets/robogen_results/Heat_up_a_bowl_of_soup_in_microwave.txt' onclick="populateDemo(this, 1);">
-            
-
-                
-                    
-                </div>
-
-              </div>
-              <div class="row border rounded" style="padding-top:2px; padding-bottom:12px;">
-                  <div class="col-md-6">
-                      <video id="demo-video-1" style="border-radius: 5px;" autoplay loop muted webkit-playsinline
-                          playsinline onclick="setAttribute('controls', 'true');">
-                          <source id="expandedImg-1" src="videos/select.m4v" type="video/mp4">
-                      </video>
-                  </div>
-              </div>
-          </div>
-          <div class="col-md-6">
-              <div id="imgtext-1" style="font-size: 1.5em">Select an image above to show the RoboGen results:</div>
-              <div>
-                  
-                  <pre class="p-1 scrollable"><code class="language-python" id="answer-1">RoboGen response shown within code block.</code></pre>
-
-              </div>
-          </div>
-      </div>
   </section>
   <!-- interactive examples of long horizon tasks -->
 
