@@ -103,7 +103,7 @@
             <!-- Abstract. -->
             <div class="columns is-centered has-text-centered">
                 <video poster="" id="" autoplay controls loop width="100%" playbackRate=2.0 style="border-radius: 5px;">
-                    <source src="videos/ilsa.mp4" type="video/mp4">
+                    <source src="videos/ilsa_iros.mp4" type="video/mp4">
                 </video>
             </div>
         </div>
@@ -117,7 +117,7 @@
                     <h2 class="title is-3">Abstract</h2>
                     <div class="content has-text-justified">
                         <p style="font-size: 125%">
-                            Shared autonomy holds promise for improving the usability and accessibility of assistive robotic arms, but current methods often rely on costly expert demonstrations and lack the ability to adapt post-deployment. This paper introduces ILSA, an Incrementally Learned Shared Autonomy framework that continually improves its assistive control policy through repeated user interactions. ILSA leverages synthetic kinematic trajectories for initial pretraining, reducing the need for expert demonstrations, and then incrementally finetunes its policy after each manipulation interaction, with mechanisms to balance new knowledge acquisition with existing knowledge retention during incremental learning. We validate ILSA for complex long-horizon tasks through a comprehensive ablation study and a user study with 20 participants, demonstrating its effectiveness and robustness in both quantitative performance and user-reported qualitative metrics.                          
+                            Shared autonomy holds promise for improving the usability and accessibility of assistive robotic arms, but current methods often rely on costly expert demonstrations and remain static after pretraining, limiting their ability to handle real-world variations. Even with extensive training data, unforeseen challenges—especially those that fundamentally alter task dynamics, such as unexpected obstacles or spatial constraints—can cause assistive policies to break down, leading to ineffective or unreliable assistance. To address this, we propose ILSA, an Incrementally Learned Shared Autonomy framework that continuously refines its assistive policy through user interactions, adapting to real-world challenges beyond the scope of pre-collected data. At the core of ILSA is a structured fine-tuning mechanism that enables continual improvement with <strong><em>each</em></strong> interaction by effectively integrating limited new interaction data while preserving prior knowledge, ensuring a balance between adaptation and generalization. A user study with 20 participants demonstrates ILSA's effectiveness, showing faster task completion and improved user experience compared to static alternatives.                          
 
 <br>
 <br>
@@ -129,42 +129,126 @@
         </div>
     </section>
 
+
+
+
     <section class="section">
         <div class="container is-max-widescreen">
             <div class="rows">
                 <div class="rows is-centered ">
                     <div class="row is-full-width">
-                        <h2 class="title is-3"><span class="dvima">Methodology</span></h2>                        
+                        <h2 class="title is-3"><span class="dvima">Motivating Example</span></h2>                        
                         <span style="font-size: 125%">
-                            <span>Our goal is to develop a function that maps the task state and user action to a robot action that is both task-optimal and aligned with the user's intent. While the function may be imperfect initially, it is designed to <strong>improve over times</strong> through continuous user interaction with the shared autonomy system. 
+                            <!-- This work is motivated by the observation that collecting large-scale demonstrations is both costly and difficult to scale. Moreover, even with extensive training data, it is impractical to cover the full range of real-world scenarios. As a result, assistive policies trained solely on pre-collected data may struggle when encountering previously unseen situations during deployment. This limitation becomes particularly critical when the training data fails to anticipate specific real-world challenges that fundamentally alter the task dynamics, such as the presence of obstacles or spatial constraints. 
+                            <br>
+                            <br> -->
+                            A motivating example is illustrated in the two figures below: In a cereal pouring task where the system needs to move a cereal container next to a bowl to pour, even a well-designed training set may not account for all possible real-world variations, such as the presence of obstacles between the two objects. If such obstacles exist in deployment, a policy trained without exposure to these cases may struggle to adapt, leading to suboptimal or even infeasible behavior, as shown in the first figure. Our system, ILSA, adresses this by incrementally learning from user interactions. As shown in the second figure, with only a few interactions, by the fourth trials, ILSA has learned effective collision avoidance from past user interactions, assisting the user in completing tasks more smoothly.
                         </span>
                         <br>
                         <br>
-                        <h3 style="font-weight: bold;">Action Generation Model</h3> 
+                        
+
+                    <div class="columns" style="display: flex; align-items: flex-end; justify-content: space-between; margin-top: 20px;">
+                        <div class="column">
+                            <img src="images/cereal1.png" alt="Figure 1" style="width: 50%; display: block; margin-left: auto; margin-right: auto;">
+                            <p style="text-align: center;">First Interaction</p>
+                        </div>
+                        <div class="column">
+                            <img src="images/cereal4.png" alt="Figure 2" style="width: 50%; display: block; margin-left: auto; margin-right: auto;">
+                            <p style="text-align: center;">Fourth Interaction</p>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+
+
+    <section class="section">
+        <div class="container is-max-widescreen">
+            <div class="rows">
+                <div class="rows is-centered ">
+                    <div class="row is-full-width">
+                        <h2 class="title is-3"><span class="dvima">Methodology</span></h2>   
+                        <span style="font-size: 140%">
+                            <h3 style="font-weight: bold;">Action Generation Model</h3> 
+                        </span>  
+                        <span style="font-size: 125%">
+                            
+                            ILSA is built upon a transformer-based robot action generation model, which maps task states and user inputs to robot actions. 
+                        </span>
+                        
                         <!-- We use a transformer-based robot action generation model to represent this function. The model generates two types of output actions: an intermediate action without user guidance and a final action with user guidance.  These actions are supervised by different loss functions, ensuring task completion and aligning the final output with the user’s intent, maintaining the user’s sense of control.  -->
                         <img src="images/model.png" class="interpolation-image" alt=""
                         style="display: block; margin-left: auto; margin-right: auto; max-width: 80%;" />
                         <br>
-                        <h3 style="font-weight: bold;">Synthetic Kinematic Trajectory Generation</h3> 
+                        <span style="font-size: 150%">
+                            <h3 style="font-weight: bold;">Fine-tuning Mechanism</h3> 
+                        </span>
+                        <div style="font-size: 125%;">
+                            
+                            <p>
+                                At the core of ILSA is a structured fine-tuning mechanism that enables continual improvement with <strong><em>each</em></strong> interaction. This frequent adaptation is particularly challenging due to limited deployment data, which can affect model stability and generalizability.
+                            </p>
+                            <p>To address this, our fine-tuning mechanism consists of three key components:</p>
+                            <ul style="list-style-type: disc; padding-left: 20px;">
+                                <li><strong>Corrected Trajectory Supervision</strong>: This design prevents the model from reinforcing suboptimal actions by generating corrected trajectories from user interactions and using them for fine-tuning.
+                                    <img src="images/corrected.png" class="interpolation-image" alt=""
+                                    style="display: block; margin-left: auto; margin-right: auto; max-width: 70%;" />
+                                </li>
+                                <li><strong>Layered Supervision</strong>: This design integrates new interaction data with pretraining knowledge to balance adaptation and retention, without requiring manual data reweighting.
+                                    <div class="columns" style="display: flex; align-items: flex-end; justify-content: space-between; margin-top: 20px;">
+                                        <div class="column">
+                                            <img src="images/layered1.png" alt="Figure 1" style="width: 100%; display: block; margin-left: auto; margin-right: auto;">
+                                            <p style="text-align: center;"></p>
+                                        </div>
+                                        <div class="column">
+                                            <img src="images/layered2.png" alt="Figure 2" style="width: 100%; display: block; margin-left: auto; margin-right: auto;">
+                                            <p style="text-align: center;"></p>
+                                        </div>
+                                        
+                                    </div>
+                                </li>
+                                <li><strong>Partial Model Update</strong>: This design selectively fine-tunes critical components to enhance adaptation while maintaining generalization and robustness
+                                    <img src="images/partial.png" class="interpolation-image" alt=""
+                                    style="display: block; margin-left: auto; margin-right: auto; max-width: 70%;" />
+                                
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <span style="font-size: 140%">
+                            <h3 style="font-weight: bold;">Full ILSA Framework</h3> 
+                        </span>
+
+                        <br>
+                        <br>
+                        
+                        <br>
+                        <img src="images/model_full.png" class="interpolation-image" alt=""
+                        style="display: block; margin-left: auto; margin-right: auto; max-width: 80%;" />
+
+                        <span style="font-size: 140%">
+                            <h3 style="font-weight: bold;">Synthetic Kinematic Trajectory Generation</h3> 
+                        </span>
+
+                        <span style="font-size: 125%">
+                            
+                            While our fine-tuning mechanism enables ILSA to adapt continuously, an effective initialization remains essential for first-time use. Instead of relying on costly human demonstrations, ILSA pretrains on lightweight simulated kinematic trajectories, generated using a rule-based procedure. 
+                        </span>
+
+                        <h3 style="font-weight: bold;"></h3> 
                         <img src="images/kinematics.png" class="interpolation-image" alt=""
                         style="display: block; margin-left: auto; margin-right: auto; max-width: 80%;" />
                         <br>
-                        <h3 style="font-weight: bold;">Finetuning Designs in the Incremental Learning Phase</h3> 
-
-                    <!-- 新增三张并排的图片及注释 -->
-                    <div class="columns" style="display: flex; align-items: flex-end; justify-content: space-between; margin-top: 20px;">
-                        <div class="column">
-                            <img src="images/correction.png" alt="Finetuning 1" style="width: 100%; display: block; margin-left: auto; margin-right: auto;">
-                            <p style="text-align: center;">Corrected Trajectory Generation</p>
-                        </div>
-                        <div class="column">
-                            <img src="images/supervision.png" alt="Finetuning 2" style="width: 100%; display: block; margin-left: auto; margin-right: auto;">
-                            <p style="text-align: center;">Layered Supervision</p>
-                        </div>
-                        <div class="column">
-                            <img src="images/freeze.png" alt="Finetuning 3" style="width: 100%; display: block; margin-left: auto; margin-right: auto;">
-                            <p style="text-align: center;">Partial Model Update</p>
-                        </div>
+                        <span style="font-size: 125%">
+                        This approach provides an effective initial assistive policy while minimizing the need for real-world data collection.
+                    </span>
                     </div>
                 </div>
             </div>
@@ -181,11 +265,27 @@
                 <div class="rows is-centered ">
                     <div class="row is-full-width">
                         <h2 class="title is-3"><span class="dvima">Human Study</span></h2>
-                        <span style="font-size: 125%">We conducted a user study subject to a university-approved IRB protocol with 20 participants, none of whom reported having prior experience teleoperating robots. </span>                      
+                        <span style="font-size: 125%">
+                            To evaluate ILSA, we conducted a user study subject to a university-approved IRB protocol with 20 participants (none of whom reported having prior experience teleoperating robots) using a Kinova robotic arm in two long-horizon tasks, which were designed to introduce unexpected challenges:
+                        </span>                      
                         <br>
                     </div>
                 </div>
-                
+                <div class="columns">
+                    <div class="column">
+                        <video width="80%" controls style="display: block; margin: 0 auto;">
+                            <source src="videos/tasks.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </div>
+
+                <br>
+                <br>
+                <span style="font-size: 150%">
+                    <h3 style="font-weight: bold;">Demonstrations</h3> 
+                </span>
+                <br>
                 <div class="columns">
                     <div class="column">
                         <video width="100%" controls>
@@ -213,28 +313,68 @@
                     </div>
                 </div>
 
+                <span style="font-size: 150%">
+                    <h3 style="font-weight: bold;">Detailed Setting and Results</h3> 
+                </span>
+                <span style="font-size: 125%">
+                    We evaluate the following two hypotheses:
+                </span>
+                <ul style="font-size: 125%; margin-top: 15px; list-style-type: disc; padding-left: 20px;">
+                    <li><strong>H1:</strong> ILSA supports faster robot manipulation task completion times and easier manipulator control as compared to pure teleoperation.</li>
+                    <li><strong>H2:</strong> ILSA effectively adapts to real-world challenges beyond the scope of training data, continuously improving task performance over time, in contrast to a static shared autonomy method.</li>
+                </ul>
+                <br>
+                
+                <span style="font-size: 125%">
+                    In order to test the two hypotheses, we divide the participants into two groups: Group 1, consisting of 10 participants, used ILSA and pure teleoperation, while Group 2, consisting of 10 participants, used teleoperation and a static shared autonomy policy, which was pretrained on the initial simulated kinematic trajectories and kept static across the four task trials. 
+                    <br>
+                    <br>
+                    While the within-subject comparison in Group 1 is sufficient to provide evidence towards H1, Group 2 is included to ensure that the reduction in task completion time with ILSA is not simply due to the user's increasing familiarity with the shared autonomy system, which provides support for H2.
+                </span>
+                
 
                 <br>
-                <div class="rows is-centered ">
-                    <div class="row is-full-width">
-                        <span style="font-size: 125%">Statistical Analysis of both task completion times and user-reported metrics supports the following two hypotheses:</span>
-                        <ul style="font-size: 125%; margin-top: 15px; list-style-type: disc; padding-left: 20px;">
-                            <li><strong>H1:</strong> ILSA supports faster robot manipulation task completion times and easier manipulator control as compared to pure teleoperation.</li>
-                            <li><strong>H2:</strong> ILSA improves task performance over time as a user repeatedly performs a task, in contrast to a static shared autonomy method.</li>
-                        </ul>
-                        <br>
-                        <div class="columns" style="display: flex; align-items: flex-end; justify-content: space-between; margin-top: 20px;">
-                            <div class="column">
-                                <img src="images/time.png" alt="Mean Task Completion Times" style="width: 100%; display: block; margin-left: auto; margin-right: auto;">
-                                <!-- <p style="text-align: center;">Task Completion Times</p> -->
-                            </div>
-                            <div class="column">
-                                <img src="images/likert.png" alt="Median Likert Item Responses" style="width: 100%; display: block; margin-left: auto; margin-right: auto;">
-                                <!-- <p style="text-align: center;">Median Likert Item Responses</p> -->
-                            </div>
-                        </div>
+                    <br>
+                    <br>
+                    <br>
+
+                <span style="font-size: 140%">
+                    <h3 style="font-weight: bold;">Task Completion Times</h3> 
+                </span>
+                <span style="font-size: 125%">
+                    We primarily evaluate task completion time as a direct and interpretable measure of user efficiency and system adaptability, which is particularly relevant in assistive settings where efficiency and ease of use directly impact user experience. 
+                </span>
+                <div class="columns" style="display: flex; align-items: flex-end; justify-content: space-between; margin-top: 20px;">
+                    <div class="column">
+                        <img src="images/time1.png" alt="Figure 1" style="width: 100%; display: block; margin-left: auto; margin-right: auto;">
+                        <p style="text-align: center;"></p>
                     </div>
+                    <div class="column">
+                        <img src="images/time2.png" alt="Figure 2" style="width: 100%; display: block; margin-left: auto; margin-right: auto;">
+                        <p style="text-align: center;"></p>
+                    </div>
+                    
                 </div>
+                
+                <br>
+                <span style="font-size: 140%">
+                    <h3 style="font-weight: bold;">User-reported Qualitative Metrics</h3> 
+                </span>
+                <span style="font-size: 125%">
+                    In addition to task completion time, we collected participants' subjective evaluations using a custom-designed 7-point Likert-scale questionnaire (1 = strongly disagree; 4 = neutral; 7 = strongly agree) to assess their perception of robot control. The full questionnaire used in our user study is available <a href="https://docs.google.com/forms/d/10y2d-wdKD_-bq6s898_eBDvD9TbIkY3rjuuFhlQTF6g/edit" target="_blank" style="color: lightblue; text-decoration: underline;">here</a>.
+                </span>
+                <div class="columns" style="display: flex; align-items: flex-end; justify-content: space-between; margin-top: 20px;">
+                    <div class="column">
+                        <img src="images/likert1.png" alt="Figure 1" style="width: 100%; display: block; margin-left: auto; margin-right: auto;">
+                        <p style="text-align: center;"></p>
+                    </div>
+                    <div class="column">
+                        <img src="images/likert2.png" alt="Figure 2" style="width: 100%; display: block; margin-left: auto; margin-right: auto;">
+                        <p style="text-align: center;"></p>
+                    </div>
+                    
+                </div>
+                
             </div>
         </div>
     </section>
